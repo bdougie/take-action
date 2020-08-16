@@ -1,8 +1,8 @@
-name: take-action
+name: contributor-takes-action
 description: This is an action to assign yourself to an issue for a repo you are not a contributor to.
 author: Brian Douglas
 branding:
-  icon: 'paperclip'
+  icon: 'thumbs-up'
   color: 'white'
 runs:
   using: 'docker'
