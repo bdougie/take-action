@@ -20,5 +20,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: take the issue
-      ses: bdougie/take-action@main
+      uses: bdougie/take-action@main
 ```
