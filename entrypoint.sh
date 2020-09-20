@@ -1,7 +1,7 @@
 #!/bin/sh
 
 BODY="$(jq '.comment.body' $GITHUB_EVENT_PATH)"
-ISSUE_NUMBER="$(jq '.issue.number' $GITHUB_EVENT_PATH | tr -d \")"
+ISSUE_NUMBER="$(jq '.issue.number' $GITHUB_EVENT_PATH)"
 LOGIN="$(jq '.comment.user.login' $GITHUB_EVENT_PATH | tr -d \")"
 REPO="$(jq '.repository.full_name' $GITHUB_EVENT_PATH | tr -d \")"
 
