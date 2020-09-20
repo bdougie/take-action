@@ -12,7 +12,7 @@ echo "action prepped"
 string="My long string"
 echo $string
 
-if [[ "$(printf '%s' "$string")" == *"My long"* ]]; then
+if [ "$(printf '%s' "$string")" == *"My long string"* ]; then
   echo "It's there!"
 fi
 
