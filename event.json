@@ -1,0 +1,28 @@
+{
+    "action": "created",
+    "issue": { "number":372},
+    "repository": {"full_name": "bdougie/bot-test-repo"},
+    "comment": {
+      "author_association": "OWNER",
+      "body": ".take\r\n",
+      "created_at": "2020-09-18T22:10:00Z",
+      "html_url": "https://github.com/bdougie/bot-test-repo/issues/422#issuecomment-695108443",
+      "id": 695108443,
+      "issue_url": "https://api.github.com/repos/bdougie/bot-test-repo/issues/422",
+      "node_id": "MDEyOklzc3VlQ29tbWVudDY5NTEwODQ0Mw==",
+      "performed_via_github_app": null,
+      "updated_at": "2020-09-18T22:10:00Z",
+      "url": "https://api.github.com/repos/bdougie/bot-test-repo/issues/comments/695108443",
+      "user": {
+        "avatar_url": "https://avatars2.githubusercontent.com/u/5713670?v=4",
+        "events_url": "https://api.github.com/users/bdougie/events{/privacy}",
+        "followers_url": "https://api.github.com/users/bdougie/followers",
+        "following_url": "https://api.github.com/users/bdougie/following{/other_user}",
+        "gists_url": "https://api.github.com/users/bdougie/gists{/gist_id}",
+        "gravatar_id": "",
+        "html_url": "https://github.com/bdougie",
+        "id": 5713670,
+        "login": "bdougie"
+      }
+    }
+  }
