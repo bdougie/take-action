@@ -8,7 +8,7 @@ This GitHub Action pins an issue based on a specified label.
 
 ## Setup
 
-```yml
+```yaml
 # .github/workflows/take.yml 
 name: Assign issue to contributor
 on: 
@@ -21,4 +21,6 @@ jobs:
     steps:
     - name: take the issue
       uses: bdougie/take-action@main
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
 ```
