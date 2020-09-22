@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 BODY="$(jq '.comment.body' $GITHUB_EVENT_PATH)"
 ISSUE_NUMBER="$(jq '.issue.number' $GITHUB_EVENT_PATH)"
