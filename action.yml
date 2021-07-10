@@ -27,7 +27,7 @@ runs:
           curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
           if [[ ! -z $INPUT_MESSAGE ]]; then
             PAYLOAD="$(jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}')"
-            curl -H "Authorization: token $GITHUB_TOKEN" -d '$PAYLOAD' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            curl -X POST -H "Authorization: token $GITHUB_TOKEN" -d '$PAYLOAD' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
           fi
         fi
       shell: bash
