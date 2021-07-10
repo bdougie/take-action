@@ -8,6 +8,8 @@ This GitHub Action pins an issue based on a specified label.
 
 ## Setup
 
+This GitHub Action requires a GITHUB_TOKEN and can be optionally configured with a message to the prospective contributor.
+  
 ```yaml
 # .github/workflows/take.yml 
 name: Assign issue to contributor
@@ -23,4 +25,6 @@ jobs:
       uses: bdougie/take-action@main
       env:
         GITHUB_TOKEN: ${{ github.token }}
+      with:
+        message: 'Thanks for taking this issue! Let us know if you have any questions!'
 ```
