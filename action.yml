@@ -25,7 +25,7 @@ runs:
           echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
           echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
           curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
-          if [[ "$INPUT_MESSAGE" -ne "" ]]; then
+          if [[! -z $INPUT_MESSAGE ]]; then
             PAYLOAD="$(jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}')"
             echo $PAYLOAD
           fi
