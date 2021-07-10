@@ -3,7 +3,7 @@
 
 ## Usage
 
-This GitHub Action pins an issue based on a specified label. 
+This GitHub Action lets a prospective contributor assign themselves to an issue, and optionally leaves a comment on the issue.
 
 
 ## Setup
@@ -26,5 +26,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        message: 'Thanks for taking this issue! Let us know if you have any questions!'
+        message: Thanks for taking this issue! Let us know if you have any questions!
 ```
