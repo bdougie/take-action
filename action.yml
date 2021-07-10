@@ -32,4 +32,4 @@ runs:
         fi
       shell: bash
       env:
-        INPUT_MESSAGE: ${{ inputs.message }}
+        INPUT_MESSAGE: "${{ inputs.message }}"
