@@ -40,8 +40,10 @@ runs:
             fi
           else
             echo "This issue is currently assigned to a different user"
+            if [[ ! -z $ISSUE_CURRENTLY_ASSIGNED_MESSAGE ]]; then
             jq -n -r --arg body "$ISSUE_CURRENTLY_ASSIGNED_MESSAGE" '{body: $body}' > payload.json
             curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            fi
           fi
         fi
       shell: bash
