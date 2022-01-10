@@ -13,7 +13,7 @@ inputs:
   issueCurrentlyAssignedMessage:
     description: 'Message to contributors if issue is already assigned'
     required: false
-    default: 'This issue is currently assigned to another contributor.'
+    default: 'The issue you are trying to assign to yourself is already assigned.'
 
 runs:
   using: "composite"
