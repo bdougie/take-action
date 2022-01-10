@@ -29,11 +29,10 @@ runs:
 
         if [[ $BODY == *".take"* ]]; then
           if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
-            echo "$ISSUE_CURRENTLY_ASSIGNED"
+            echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
             echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
             echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
             curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
-            echo "What is the input message?"
             if [[ ! -z $INPUT_MESSAGE ]]; then
               jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
               curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
