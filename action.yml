@@ -10,6 +10,10 @@ inputs:
     description: 'Message to prospective contributor'
     required: false
     default: ''
+  issueCurrentlyAssignedMessage:
+    description: 'Message to contributors if issue is already assigned'
+    required: false
+    default: 'The issue you are trying to assign to yourself is already assigned.'
 
 runs:
   using: "composite"
@@ -25,7 +29,7 @@ runs:
 
         if [[ $BODY == *".take"* ]]; then
           if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
-            echo "$ISSUE_CURRENTLY_ASSIGNED"
+            echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
             echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
             echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
             curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
@@ -35,8 +39,13 @@ runs:
             fi
           else
             echo "This issue is currently assigned to a different user"
+            if [[ ! -z $ISSUE_CURRENTLY_ASSIGNED_MESSAGE ]]; then
+            jq -n -r --arg body "$ISSUE_CURRENTLY_ASSIGNED_MESSAGE" '{body: $body}' > payload.json
+            curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            fi
           fi
         fi
       shell: bash
       env:
         INPUT_MESSAGE: "${{ inputs.message }}"
+        ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"
