@@ -47,6 +47,6 @@ runs:
         fi
       shell: bash
       env:
-        INPUT_CONFIRMATION_MESSAGE: "${{ inputs.confirmation_message }}"
+        INPUT_CONFIRMATION_MESSAGE: "${{ inputs.message }}"
         INPUT_ACTIVATION_MESSAGE: "${{ inputs.activation_message }}"
         ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"
