@@ -27,14 +27,14 @@ runs:
         ISSUE_JSON="$(jq '.issue' $GITHUB_EVENT_PATH)"
         ISSUE_CURRENTLY_ASSIGNED=`echo $ISSUE_JSON | jq '.assignees | length == 0'`
 
-        if [[ $BODY == *"$INPUT_ACTIVATION_MESSAGE"* ]]; then
+        if [[ $BODY == *"$INPUT_TRIGGER"* ]]; then
           if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
             echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
             echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
             echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
             curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
-            if [[ ! -z $INPUT_CONFIRMATION_MESSAGE ]]; then
-              jq -n -r --arg body "$INPUT_CONFIRMATION_MESSAGE" '{body: $body}' > payload.json
+            if [[ ! -z $INPUT_MESSAGE ]]; then
+              jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
               curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
             fi
           else
@@ -47,6 +47,6 @@ runs:
         fi
       shell: bash
       env:
-        INPUT_CONFIRMATION_MESSAGE: "${{ inputs.message }}"
-        INPUT_ACTIVATION_MESSAGE: "${{ inputs.activation_message }}"
+        INPUT_MESSAGE: "${{ inputs.message }}"
+        INPUT_TRIGGER: "${{ inputs.trigger }}"
         ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"

@@ -5,8 +5,8 @@
 
 This GitHub Action lets a prospective contributor assign themselves to an issue, and optionally leaves a comment on the issue.
 
-- `confirmation_message`<br />The message to display to the user once they have assigned themselves to an issue.
-- `activation_message`<br />The string that take action will search for in the comment body to activate the action.
+- `message`<br />The message to display to the user once they have assigned themselves to an issue.
+- `trigger`<br />The string that take action will search for in the comment body to activate the action.
 
 ## Setup
 
@@ -28,6 +28,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        confirmation_message: Thanks for taking this issue! Let us know if you have any questions!
-        activation_message: .take
+        message: Thanks for taking this issue! Let us know if you have any questions!
+        trigger: .take
 ```
