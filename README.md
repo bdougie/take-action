@@ -6,6 +6,7 @@
 This GitHub Action lets a prospective contributor assign themselves to an issue, and optionally leaves a comment on the issue.
 
 
+
 ## Setup
 
 This GitHub Action requires a GITHUB_TOKEN and can be optionally configured with a message to the prospective contributor.
@@ -26,5 +27,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        message: Thanks for taking this issue! Let us know if you have any questions!
+        confirmation_message: Thanks for taking this issue! Let us know if you have any questions!
+        activation_message: .take
 ```
