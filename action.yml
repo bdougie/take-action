@@ -14,6 +14,10 @@ inputs:
     description: 'Message to contributors if issue is already assigned'
     required: false
     default: 'The issue you are trying to assign to yourself is already assigned.'
+  trigger:
+    description: 'The string that triggers the action'
+    required: false
+    default: '.take'
 
 runs:
   using: "composite"
