@@ -18,10 +18,6 @@ inputs:
     description: 'The string that triggers the action'
     required: false
     default: '.take'
-  block-list:
-    description: 'List of users to block from self-assigning'
-    required: false
-    default: []
 
 runs:
   using: "composite"
@@ -33,38 +29,28 @@ runs:
         LOGIN="$(jq '.comment.user.login' $GITHUB_EVENT_PATH | tr -d \")"
         REPO="$(jq '.repository.full_name' $GITHUB_EVENT_PATH | tr -d \")"
         ISSUE_JSON="$(jq '.issue' $GITHUB_EVENT_PATH)"
-        ISSUE_AWAITING_ASSIGNMENT=`echo $ISSUE_JSON | jq '.assignees | length == 0'`
+        ISSUE_CURRENTLY_ASSIGNED=`echo $ISSUE_JSON | jq '.assignees | length == 0'`
 
-        if [[ $BODY != *"$INPUT_TRIGGER"* ]]; then
-          echo "No trigger found"
-          exit 0
+        if [[ $BODY == *"$INPUT_TRIGGER"* ]]; then
+          if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
+            echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
+            echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
+            echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
+            curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
+            if [[ ! -z $INPUT_MESSAGE ]]; then
+              jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
+              curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            fi
+          else
+            echo "This issue is currently assigned to a different user"
+            if [[ ! -z $ISSUE_CURRENTLY_ASSIGNED_MESSAGE ]]; then
+            jq -n -r --arg body "$ISSUE_CURRENTLY_ASSIGNED_MESSAGE" '{body: $body}' > payload.json
+            curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            fi
+          fi
         fi
-        
-        if [[ "${INPUT_BLOCK_LIST[*]}" =~ "$LOGIN" ]]; then
-          echo "User is in block list"
-          exit 0
-        fi
-        
-        if [[ "ISSUE_AWAITING_ASSIGNMENT" == false ]]; then
-          echo "This issue is currently assigned to a different user"
-          if [[ ! -z $ISSUE_CURRENTLY_ASSIGNED_MESSAGE ]]; then
-          jq -n -r --arg body "$ISSUE_CURRENTLY_ASSIGNED_MESSAGE" '{body: $body}' > payload.json
-          curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
-          exit 0
-        fi
-        
-        echo "Issue is currently awaiting assignment: $ISSUE_AWAITING_ASSIGNMENT"
-        echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
-        echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
-        curl -H "Authorization: token $GITHUB_TOKEN" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
-        if [[ ! -z $INPUT_MESSAGE ]]; then
-          jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
-          curl -X POST -H "Authorization: token $GITHUB_TOKEN" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
-        exit 0
-
       shell: bash
       env:
         INPUT_MESSAGE: "${{ inputs.message }}"
         INPUT_TRIGGER: "${{ inputs.trigger }}"
-        INPUT_BLOCK_LIST: "${{ inputs.block-list }}"
         ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"
