@@ -10,12 +10,16 @@ This GitHub Action lets a prospective contributor assign themselves to an issue,
 
 ## Setup
 
-This GitHub Action requires a GITHUB_TOKEN and can be optionally configured with a message to the prospective contributor.
-  
-Before you use this GitHub Action, you'll need to create a personal access token if you are using it on a personal repository. If you are wanting to use this for a organisation repository, you'll need an personal access token for your organisation. Check out the GitHub Docs on [how to create a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-fine-grained-personal-access-token) and [how to setup a personal access token for organisations](https://docs.github.com/en/enterprise-cloud@latest/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization).
-  
-You'll need this token to replace `github.token` on line 33 below.
-  
+This GitHub Action can be optionally configured with a message to the prospective contributor.
+
+The Action must be given a PAT with permission to write to Issues in the `token` input.
+
+The easiest way is to use the built-in `${{ secrets.GITHUB_TOKEN }}` for authentication (as per the example below), but you'll need to ensure you've appropriately set [the permissions for the GitHub Token](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token) so that your workflow can update Issues.
+
+To do this, follow the instructions in this doc: [Managing GitHub Actions Permissions for your repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository).
+
+### Example Workflow:
+
 ```yaml
 # .github/workflows/take.yml 
 name: Assign issue to contributor
@@ -26,12 +30,13 @@ jobs:
   assign:
     name: Take an issue
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
     - name: take the issue
       uses: bdougie/take-action@main
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
       with:
         message: Thanks for taking this issue! Let us know if you have any questions!
         trigger: .take
+        token: ${{ secrets.GITHUB_TOKEN }}
 ```
