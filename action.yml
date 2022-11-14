@@ -35,16 +35,16 @@ runs:
             echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
             echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
             echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
-            curl -H "Authorization: bearer ${{ secrets.GITHUB_TOKEN }}" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
+            curl -H "Authorization: bearer ${{ GITHUB_TOKEN }}" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
             if [[ ! -z $INPUT_MESSAGE ]]; then
               jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
-              curl -X POST -H "Authorization: bearer ${{ secrets.GITHUB_TOKEN }}" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+              curl -X POST -H "Authorization: bearer ${{ GITHUB_TOKEN }}" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
             fi
           else
             echo "This issue is currently assigned to a different user"
             if [[ ! -z $ISSUE_CURRENTLY_ASSIGNED_MESSAGE ]]; then
             jq -n -r --arg body "$ISSUE_CURRENTLY_ASSIGNED_MESSAGE" '{body: $body}' > payload.json
-            curl -X POST -H "Authorization: bearer ${{ secrets.GITHUB_TOKEN }}" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            curl -X POST -H "Authorization: bearer ${{ GITHUB_TOKEN }}" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
             fi
           fi
         fi
