@@ -53,3 +53,4 @@ runs:
         INPUT_MESSAGE: "${{ inputs.message }}"
         INPUT_TRIGGER: "${{ inputs.trigger }}"
         ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"
+        GITHUB_PAT: "${{ secrets.GITHUB_TOKEN }}"
