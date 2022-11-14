@@ -17,6 +17,8 @@ The Action must be given a PAT with permission to write to Issues in the `token`
 The easiest way is to use the built-in `${{ secrets.GITHUB_TOKEN }}` for authentication (as per the example below), but you'll need to ensure you've appropriately set [the permissions for the GitHub Token](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token) so that your workflow can update Issues.
 
 To do this, follow the instructions in this doc: [Managing GitHub Actions Permissions for your repository](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#managing-github-actions-permissions-for-your-repository).
+  
+You can also configure `message:` below to be a custom message. Note that you cannot use words like `it's` or `let's` as the apostrophe messes with the syntax. You can use emojis, however you'll need to copy and paste the emoji directly like `❤️` instead of `:heart:` as the semi-colons ruin the syntax. 
 
 ### Example Workflow:
 
