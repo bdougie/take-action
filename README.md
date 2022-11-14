@@ -12,6 +12,10 @@ This GitHub Action lets a prospective contributor assign themselves to an issue,
 
 This GitHub Action requires a GITHUB_TOKEN and can be optionally configured with a message to the prospective contributor.
   
+Before you use this GitHub Action, you'll need to create a personal access token if you are using it on a personal repository. If you are wanting to use this for a organisation repository, you'll need an personal access token for your organisation. Check out the GitHub Docs on [how to create a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#creating-a-fine-grained-personal-access-token) and [how to setup a personal access token for organisations](https://docs.github.com/en/enterprise-cloud@latest/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization).
+  
+You'll need this token to replace `github.token` on line 33 below.
+  
 ```yaml
 # .github/workflows/take.yml 
 name: Assign issue to contributor
