@@ -42,7 +42,7 @@ runs:
         LOGIN="$(jq '.comment.user.login' $GITHUB_EVENT_PATH | tr -d \")"
         REPO="$(jq '.repository.full_name' $GITHUB_EVENT_PATH | tr -d \")"
         ISSUE_JSON="$(jq '.issue' $GITHUB_EVENT_PATH)"
-        ISSUE_LABELS="$(jq '.issue.labels' $GITHUB_EVENT_PATH)"
+        ISSUE_LABELS="$(jq '.issue.labels[].name' $GITHUB_EVENT_PATH)"
         ISSUE_CURRENTLY_ASSIGNED=`echo $ISSUE_JSON | jq '.assignees | length == 0'`
 
         if [[ $BODY == *"$INPUT_TRIGGER"* ]]; then
