@@ -14,6 +14,17 @@ inputs:
     description: 'Message to contributors if issue is already assigned'
     required: false
     default: 'The issue you are trying to assign to yourself is already assigned.'
+
+  blockingLabels:
+    description: 'Optional labels that are on an issue that block an issue from being assigned by the trigger.'
+    required: false
+    default: ''
+
+  blockingLabelsMessage:
+    description: 'Message to contributors if issue is blocked by a label'
+    required: false
+    default: 'The issue you are trying to assign to yourself is blocked by a one or more labels on the issue.'
+
   trigger:
     description: 'The string that triggers the action'
     required: false
@@ -54,6 +65,8 @@ runs:
       shell: bash
       env:
         INPUT_MESSAGE: "${{ inputs.message }}"
+        RAW_BLOCKING_LABELS: "${{ inputs.blockingLabels }}"
+        BLOCKING_LABELS_MESSAGE: "${{ inputs.blockingLabelsMessage }}"
         INPUT_TRIGGER: "${{ inputs.trigger }}"
         ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"
         GITHUB_PAT: "${{ inputs.token }}"
