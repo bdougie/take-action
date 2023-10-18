@@ -53,6 +53,7 @@ runs:
             echo "Issue labels: $ISSUE_LABELS"
             echo "Blocking labels: $BLOCKING_LABELS"
 
+            # See if at least one label on the issue is in the list of blocking labels
             blocking_label_found=$(jq -n --argjson ISSUE_LABELS "$ISSUE_LABELS" --argjson BLOCKING_LABELS "$BLOCKING_LABELS" '$ISSUE_LABELS as $il | $BLOCKING_LABELS as $bl | any($il[]; . as $i | any($bl[]; . == $i))')
 
             echo "blocking label found: $blocking_label_found"
@@ -61,11 +62,13 @@ runs:
               echo "Issue contains one or more blocking labels: $BLOCKING_LABELS"
               echo "Unable to assign issue $ISSUE_NUMBER to $LOGIN"
 
+              # Post a comment on the issue that there are blocking labels on the issue preventing it from being assigned
               if [[ ! -z $BLOCKING_LABELS_MESSAGE ]]; then
                 jq -n -r --arg body "$BLOCKING_LABELS_MESSAGE" '{body: $body}' > payload.json
                 curl -X POST -H "Authorization: bearer $GITHUB_PAT" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
               fi
             else
+              # Assign the issue to the user
               echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
               echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
               echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
