@@ -42,29 +42,20 @@ runs:
         LOGIN="$(jq '.comment.user.login' $GITHUB_EVENT_PATH | tr -d \")"
         REPO="$(jq '.repository.full_name' $GITHUB_EVENT_PATH | tr -d \")"
         ISSUE_JSON="$(jq '.issue' $GITHUB_EVENT_PATH)"
-        ISSUE_LABELS="$(jq '.issue.labels[].name' $GITHUB_EVENT_PATH)"
+        ISSUE_LABELS="$(jq -r '.issue.labels[].name' $GITHUB_EVENT_PATH)"
+        ISSUE_LABELS=$(echo "$ISSUE_LABELS" | jq -n --arg str "$ISSUE_LABELS" '$str | split("\n")')
         ISSUE_CURRENTLY_ASSIGNED=`echo $ISSUE_JSON | jq '.assignees | length == 0'`
 
         if [[ $BODY == *"$INPUT_TRIGGER"* ]]; then
           if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
             BLOCKING_LABELS=$(echo "$RAW_BLOCKING_LABELS" | jq -n --arg str "$RAW_BLOCKING_LABELS" '$str | split(",")')
 
-            blocking_label_found=false
+            echo "Issue labels: $ISSUE_LABELS"
+            echo "Blocking labels: $BLOCKING_LABELS"
 
-            # See if any of the issue labels match at least one blocking label
-            for issue_label in "${ISSUE_LABELS[@]}"; do
-                label_exists=false
-                for blocking_label in "${BLOCKING_LABELS[@]}"; do
-                    if [ "$issue_label" == "$blocking_label" ]; then
-                        label_exists=true
-                        break
-                    fi
-                done
+            blocking_label_found=$(jq -n --argjson ISSUE_LABELS "$ISSUE_LABELS" --argjson BLOCKING_LABELS "$BLOCKING_LABELS" '$ISSUE_LABELS as $il | $BLOCKING_LABELS as $bl | any($il[]; . as $i | any($bl[]; . == $i))')
 
-                if [ "$value_exists" == true ]; then
-                    blocking_label_found=true
-                fi
-            done
+            echo "blocking label found: $blocking_label_found"
 
             if [ "$blocking_label_found" == true ]; then
               echo "Issue contains one or more blocking labels: $BLOCKING_LABELS"
