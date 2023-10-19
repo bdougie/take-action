@@ -14,6 +14,17 @@ inputs:
     description: 'Message to contributors if issue is already assigned'
     required: false
     default: 'The issue you are trying to assign to yourself is already assigned.'
+
+  blockingLabels:
+    description: 'Optional labels that are on an issue that block an issue from being assigned by the trigger.'
+    required: false
+    default: ''
+
+  blockingLabelsMessage:
+    description: 'Message to contributors if issue is blocked by a label'
+    required: false
+    default: 'The issue you are trying to assign to yourself is blocked by a one or more labels on the issue.'
+
   trigger:
     description: 'The string that triggers the action'
     required: false
@@ -31,17 +42,46 @@ runs:
         LOGIN="$(jq '.comment.user.login' $GITHUB_EVENT_PATH | tr -d \")"
         REPO="$(jq '.repository.full_name' $GITHUB_EVENT_PATH | tr -d \")"
         ISSUE_JSON="$(jq '.issue' $GITHUB_EVENT_PATH)"
+        ISSUE_LABELS="$(jq -r '.issue.labels[].name' $GITHUB_EVENT_PATH)"
+        ISSUE_LABELS=$(echo "$ISSUE_LABELS" | jq -n --arg str "$ISSUE_LABELS" '$str | split("\n")')
         ISSUE_CURRENTLY_ASSIGNED=`echo $ISSUE_JSON | jq '.assignees | length == 0'`
 
         if [[ $BODY == *"$INPUT_TRIGGER"* ]]; then
           if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
-            echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
-            echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
-            echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
-            curl -H "Authorization: bearer $GITHUB_PAT" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
-            if [[ ! -z $INPUT_MESSAGE ]]; then
-              jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
-              curl -X POST -H "Authorization: bearer $GITHUB_PAT" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+            if [ -n "$RAW_BLOCKING_LABELS" ]; then
+                BLOCKING_LABELS=$(echo "$RAW_BLOCKING_LABELS" | jq -n --arg str "$RAW_BLOCKING_LABELS" '$str | split(",")')
+            else
+                # In case no blocking labels are set, set an empty array
+                BLOCKING_LABELS=()
+            fi
+
+            echo "Issue labels: $ISSUE_LABELS"
+            echo "Blocking labels: $BLOCKING_LABELS"
+
+            # See if at least one label on the issue is in the list of blocking labels
+            blocking_label_found=$(jq -n --argjson ISSUE_LABELS "$ISSUE_LABELS" --argjson BLOCKING_LABELS "$BLOCKING_LABELS" '$ISSUE_LABELS as $il | $BLOCKING_LABELS as $bl | any($il[]; . as $i | any($bl[]; . == $i))')
+
+            echo "blocking label found: $blocking_label_found"
+
+            if [ "$blocking_label_found" == true ]; then
+              echo "Issue contains one or more blocking labels: $BLOCKING_LABELS"
+              echo "Unable to assign issue $ISSUE_NUMBER to $LOGIN"
+
+              # Post a comment on the issue that there are blocking labels on the issue preventing it from being assigned
+              if [[ ! -z $BLOCKING_LABELS_MESSAGE ]]; then
+                jq -n -r --arg body "$BLOCKING_LABELS_MESSAGE" '{body: $body}' > payload.json
+                curl -X POST -H "Authorization: bearer $GITHUB_PAT" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+              fi
+            else
+              # Assign the issue to the user
+              echo "Is issue currently assigned: $ISSUE_CURRENTLY_ASSIGNED"
+              echo "Assigning issue $ISSUE_NUMBER to $LOGIN"
+              echo "Using the link: https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees"
+              curl -H "Authorization: bearer $GITHUB_PAT" -d '{"assignees":["'"$LOGIN"'"]}' https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/assignees
+              if [[ ! -z $INPUT_MESSAGE ]]; then
+                jq -n -r --arg body "$INPUT_MESSAGE" '{body: $body}' > payload.json
+                curl -X POST -H "Authorization: bearer $GITHUB_PAT" --data @payload.json https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/comments
+              fi
             fi
           else
             echo "This issue is currently assigned to a different user"
@@ -54,6 +94,8 @@ runs:
       shell: bash
       env:
         INPUT_MESSAGE: "${{ inputs.message }}"
+        RAW_BLOCKING_LABELS: "${{ inputs.blockingLabels }}"
+        BLOCKING_LABELS_MESSAGE: "${{ inputs.blockingLabelsMessage }}"
         INPUT_TRIGGER: "${{ inputs.trigger }}"
         ISSUE_CURRENTLY_ASSIGNED_MESSAGE: "${{ inputs.issueCurrentlyAssignedMessage }}"
         GITHUB_PAT: "${{ inputs.token }}"
