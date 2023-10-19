@@ -48,12 +48,7 @@ runs:
 
         if [[ $BODY == *"$INPUT_TRIGGER"* ]]; then
           if [[ "$ISSUE_CURRENTLY_ASSIGNED" == true ]]; then
-            if [ -n "$RAW_BLOCKING_LABELS" ]; then
-                BLOCKING_LABELS=$(echo "$RAW_BLOCKING_LABELS" | jq -n --arg str "$RAW_BLOCKING_LABELS" '$str | split(",")')
-            else
-                # In case no blocking labels are set, set an empty array
-                BLOCKING_LABELS=()
-            fi
+            BLOCKING_LABELS=$(echo "$RAW_BLOCKING_LABELS" | jq -n --arg str "$RAW_BLOCKING_LABELS" '$str | split(",")')
 
             echo "Issue labels: $ISSUE_LABELS"
             echo "Blocking labels: $BLOCKING_LABELS"
